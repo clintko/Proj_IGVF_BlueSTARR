@@ -1,0 +1,11 @@
+Name	Genomic coordinates (GRCh37)	Genomic coordinates (GRCh38)	Transcript	Associated Phenotype	Luciferase vector	MPRA vector	Cell line	Transf. time (hr)	Fold change (Wild type)	Fold Change (MPRA)	Construct size (bp)
+F9	"chrX:138,612,622-138,612,924"	"chrX:139,530,463-139,530,765"	NM_000133.3	Hemophilia B	pGL4.11b	pGL4.11c	HepG2	24	2.6	2.1	303
+FOXE1	"chr9:100,615,537-100,616,136"	"chr9:97,853,255-97,853,854"	NM_004473.3	Thyroid cancer	pGL4.11b	pGL4.11c	HeLa	24	4.2	2.5	600
+GP1BB	"chr22:19,710,789-19,711,173"	"chr22:19,723,266-19,723,650"	NM_000407.4	Bernard-Soulier Syndrome	pGL4.11b	pGL4.11c	HEL 92.1.7	24	22.1	12.3	385
+HBB	"chr11:5,248,252-5,248,438"	"chr11:5,227,022-5,227,208"	NM_000518.4	Thalassemia	pGL4.11b	pGL4.11c	HEL 92.1.7	24	14.3	8.4	187
+HBG1	"chr11:5,271,035-5,271,308"	"chr11:5,249,805-5,250,078"	NM_000559.2	Hereditary persistence of fetal hemoglobin	pGL4.11b	pGL4.11c	HEL 92.1.7	24	118.1	41.8	274
+HNF4A (P2)	"chr20:42,984,160-42,984,444"	"chr20:44,355,520-44,355,804"	NM_175914.4	Maturity-onset diabetes of the young (MODY)	pGL4.11b	pGL4.11c	HEK293T	24	2.8	1.3	285
+LDLR	"chr19:11,199,907-11,200,224"	"chr19:11,089,231-11,089,548"	NM_000527.4	Familial hypercholesterolemia	pGL4.11b	pGL4.11b	HepG2	24	110.7	76.6	318
+MSMB	"chr10:51,548,988-51,549,578"	"chr10:46,046,244-46,046,834"	NM_002443.3	Prostate cancer	pGL4.11b	pGL4.11c	HEK293T	24	8.4	3.4	593
+PKLR	"chr1:155,271,186-155,271,655"	"chr1:155,301,395-155,301,864"	NM_000298.5	Pyruvate kinase deficiency	pGL4.11b	pGL4.11c	K562	48	29.4	9.6	470
+TERT	"chr5:1,295,104-1,295,362"	"chr5:1,294,989-1,295,247"	NM_198253.2	Various types of cancer	pGL4.11b	pGL4.11b	"HEK293T, SF7996"	24	"231.8,5.2"	"148.2, 2.7"	259
