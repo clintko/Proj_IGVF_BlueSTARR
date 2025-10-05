@@ -81,9 +81,6 @@ def main(args):
             ###################################
             # Parse/Process each line
             #----------------------------------
-            # quick quard, skip comment
-            if not line.strip():
-                continue
             
             # parse each line
             txt_region, num_position, txt_variant_reference_base, txt_variant_alternate_base = line.strip().split("\t")
@@ -135,6 +132,7 @@ def main(args):
             #)
 
             # Update: run prediction with retry/pacing
+            # since there is a limit quota within a certain time period per API key
             # if exceed quota, retry; output errors if unsucceed
             try:
                 variant_scores = score_with_retry(
@@ -142,7 +140,7 @@ def main(args):
                     min_delay=args.min_delay
                 )
             except Exception as e:
-                # sidecar errors file, keep going
+                # export error file, keep going to the next query
                 with open(args.output + ".errors", "a") as ferr:
                     ferr.write(f"{txt_region}\t{num_position}\t{txt_variant_reference_base}\t{txt_variant_alternate_base}\t{repr(e)}\n")
                 continue
@@ -150,7 +148,7 @@ def main(args):
             # convert results into a dataframe
             dat_scores = variant_scorers.tidy_scores(variant_scores)
             
-            # Skip if nothing came back
+            # Skip if nothing came back (create a text log file and write error message)
             if dat_scores is None or getattr(dat_scores, "empty", False):
                 with open(args.output + ".errors", "a") as ferr:
                     ferr.write(
@@ -162,8 +160,9 @@ def main(args):
             # apply biosample filter only when requested
             if args.biosample:
                 dat_scores = dat_scores.loc[dat_scores["biosample_name"] == args.biosample]
+
+                # if nothing for this biosample (add message to the log file and continue)
                 if dat_scores.empty:
-                    # nothing for this biosample-add log and skip
                     with open(args.output + ".errors", "a") as ferr:
                         ferr.write(
                             f"{txt_region}\t{num_position}\t{txt_variant_reference_base}\t"
@@ -203,7 +202,7 @@ if __name__ == "__main__":
     parser.add_argument("-b", "--biosample", default=None, 
                         help="Optional biosample filter, e.g. K562")
     parser.add_argument("--min-delay", type=float, default=0.3,
-                        help="Seconds to sleep after each request (client-side pacing).")
+                        help="Seconds to sleep after each request.")
     args = parser.parse_args()
 
     # execute main

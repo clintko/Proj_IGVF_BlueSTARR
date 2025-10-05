@@ -42,6 +42,11 @@ FP_CNF=${FD_EXE}/config_project.sh
 
 ### Singularity image file path
 FP_PRJ_SIF=${FD_SING}/project/singularity_proj_igvf_bluestarr.sif
+FP_APP=${FD_EXE}/run_script.sh
+
+### Define usable partitions and join into comma-separated string
+ARR_PARTS=(igvf scavenger common)
+TXT_PARTS=$(IFS=,; echo "${ARR_PARTS[*]}")
 
 #########################################
 ### helper function: show environment
@@ -64,5 +69,6 @@ show_env() {
     echo "PROJECT REF     (FD_REF):      ${FD_REF}"
     echo "PROJECT IMAGE   (FP_PRJ_SIF):  ${FP_PRJ_SIF}"
     echo "PROJECT CONF.   (FP_CNF):      ${FP_CNF}"
+    echo "PROJECT APP     (FP_APP):      ${FP_APP}"
     echo
 }
