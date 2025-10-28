@@ -1,7 +1,9 @@
 """
 Module for one-hot encoding sequence to matrix and decoding the corresponding matrix back to sequence
 """
+
 import numpy as np
+
 
 def one_hot_encode(txt_seq, txt_alphabet = "ACGT"):
     """
@@ -33,6 +35,7 @@ def one_hot_encode(txt_seq, txt_alphabet = "ACGT"):
         if base in dct:
             arr[idx, dct[base]] = 1.0
     return arr
+
 
 def decode_one_hot(arr_seq_NxB, txt_alphabet = "ACGT"):
     """Helper function to turn one-hot encoded matrix back to seuqence"""

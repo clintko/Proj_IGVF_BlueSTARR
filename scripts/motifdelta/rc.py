@@ -1,7 +1,9 @@
 """
 Module for reverse compliment sequence and matrix
 """
+
 import numpy as np
+
 
 def reverse_complement_sequence(txt_seq):
     """
@@ -22,6 +24,7 @@ def reverse_complement_sequence(txt_seq):
         "TGCAtgca"   ### to   those alphabets
     )
     return txt_seq.translate(dct_complement)[::-1] ### flip the order as well
+
     
 def reverse_complement_matrix(arr_seq_NxB, txt_alphabet = "ACGT"):
     """
