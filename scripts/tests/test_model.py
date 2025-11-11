@@ -48,15 +48,16 @@ def test_precompute_pmaps_output_keys():
 
     expected_keys = {
         "arr_num_score_grid",
-        "arr_num_pmf",
-        "arr_num_ccdf",
+        "arr_num_score_pmf",
+        "arr_num_score_ccdf",
+        "arr_lod_WxB",
         "num_Tbind",
         "num_alpha",
         "num_precision"
     }
     assert set(dct.keys()) == expected_keys
-    assert np.isclose(dct["arr_num_pmf"].sum(), 1.0, atol=1e-6)
-    assert np.all(np.diff(dct["arr_num_ccdf"]) <= 1e-9)
+    assert np.isclose(dct["arr_num_score_pmf"].sum(), 1.0, atol=1e-6)
+    assert np.all(np.diff(dct["arr_num_score_ccdf"]) <= 1e-9)
     assert isinstance(dct["num_Tbind"], float)
 
 

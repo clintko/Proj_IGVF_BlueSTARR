@@ -9,45 +9,32 @@ import pickle
 
 from Bio import SeqIO
 
-#from fun_motifscan import scan_sequence_batch_parallel
-from motifdelta import scan_sequence_batch_parallel
+from fun_motifscan import scan_sequence_batch_parallel
 
 
 def main(args):
     # ==============================
     # Load FASTA sequences
     # ------------------------------
-    lst_seq_record = list(SeqIO.parse(args.txt_fpath_fasta, "fasta"))
-    print(f"Loaded {len(lst_seq_record)} sequences from {args.txt_fpath_fasta}\n")
-
-    lst_txt_seq_idx = [rec.id for rec in lst_seq_record]
-    lst_txt_seq_str = [str(rec.seq).upper() for rec in lst_seq_record]
+    lst_seq = list(SeqIO.parse(args.txt_fpath_fasta, "fasta"))
+    print(f"Loaded {len(lst_seq)} sequences from {args.txt_fpath_fasta}\n")
     
     # ==============================
     # Load motif matrices
     # ------------------------------
     obj = np.load(args.txt_fpath_motif, allow_pickle=True)
-    #dct_motif_lods = obj["lods"].item()
-    #print(f"Loaded {len(dct_motif_lods)} motifs from {args.txt_fpath_motif}\n")
+    dct_motif_lods = obj["lods"].item()
+    print(f"Loaded {len(dct_motif_lods)} motifs from {args.txt_fpath_motif}\n")
 
-    dct_motif_model = obj["dct_results"].item()  # motif_name -> {arr_lod_WxB, grid, ccdf, Tbind, ...}
-    print(f"Loaded PMAPs for {len(dct_motif_model)} motifs from {args.txt_fpath_motif}\n")
-    
     # ==============================
     # Run motif scanning
     # ------------------------------
     print(f"Running motif scanning using {args.num_core} cores...")
     time_start = time.time()
 
-    #dct_results = scan_sequence_batch_parallel(
-    #    lst_seq,
-    #    dct_motif_lods,
-    #    num_workers=args.num_core
-    #)
     dct_results = scan_sequence_batch_parallel(
-        lst_txt_seq_idx,
-        lst_txt_seq_str,
-        dct_motif_model,
+        lst_seq,
+        dct_motif_lods,
         num_workers=args.num_core
     )
 
