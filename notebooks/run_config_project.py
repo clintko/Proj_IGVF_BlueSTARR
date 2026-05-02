@@ -7,6 +7,7 @@ _THIS_FILE = Path(__file__).resolve()
 FD_NBK     = _THIS_FILE.parent  # notebook folder
 FD_PRJ     = FD_NBK.parent      # project root dir
 FD_EXE     = FD_PRJ / "scripts" # script folder
+#FD_PKG     = FD_PRJ / "motifdelta" / "src" # package folder
 
 # Put scripts on sys.path if not already there
 spath = str(FD_EXE)
