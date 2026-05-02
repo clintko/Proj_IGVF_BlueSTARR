@@ -10,7 +10,8 @@ import argparse
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-from motifdelta.stats import precompute_pmaps
+from motifdelta import precompute_pmaps
+
 
 
 # ====================================================================
@@ -20,8 +21,8 @@ def batch_precompute_pmaps(
     dct_arr_motif_lod_WxB,
     arr_bg_B,
     num_alpha=1e-3,
-    num_precision=1e-2,
-    lst_score_range=(-60, 60),
+    num_precision=1e-3,
+    lst_score_range=(-50, 50),
     num_verbose_every=100
 ):
     """
@@ -37,9 +38,9 @@ def batch_precompute_pmaps(
     num_alpha : float, optional
         Tail probability threshold for T_bind. Default = 1e-3.
     num_precision : float, optional
-        Discretization bin width for DP grid. Default = 1e-2.
+        Discretization bin width for DP grid. Default = 1e-3.
     lst_score_range : tuple, optional
-        Range of scores to consider in bits. Default = (-60, 60).
+        Range of scores to consider in bits. Default = (-50, 50).
     num_verbose_every : int, optional
         Print progress every N motifs.
 
@@ -76,8 +77,8 @@ def batch_precompute_pmaps_parallel(
     dct_arr_motif_lod_WxB,
     arr_bg_B,
     num_alpha=1e-3,
-    num_precision=1e-2,
-    lst_score_range=(-60, 60),
+    num_precision=1e-3,
+    lst_score_range=(-50, 50),
     num_verbose_every=100,
     num_workers=None
 ):
@@ -111,9 +112,9 @@ def batch_precompute_pmaps_parallel(
                 precompute_pmaps,
                 arr_motif_lod_WxB,
                 arr_bg_B,
-                num_alpha=num_alpha,
-                num_precision=num_precision,
-                lst_score_range=lst_score_range,
+                num_alpha,
+                num_precision,
+                lst_score_range,
             ): motif_name
             for motif_name, arr_motif_lod_WxB in dct_arr_motif_lod_WxB.items()
         }
@@ -133,9 +134,8 @@ def batch_precompute_pmaps_parallel(
             ### verbose
             if (idx+1) % num_verbose_every == 0 or idx == num_total - 1:
                 print(f"[{idx+1}/{num_total}] {motif_name}")
-
-    num_ok = sum(v is not None for v in dct_results.values())
-    print(f"Finished precomputing p-maps for {num_ok}/{num_total} motifs.")
+                
+    print(f"Finished precomputing p-maps for {len(dct_results)} motifs.")
     return dct_results
 
 
@@ -147,10 +147,9 @@ def main(args):
     """Main function"""
 
     ### pass argument
-    txt_fpath_inp       = args.txt_fpath_inp
-    txt_fpath_out_pmap  = args.txt_fpath_out_pmap
-    txt_fpath_out_tbind = args.txt_fpath_out_tbind
-    num_workers         = args.num_workers
+    txt_fpath_inp = args.txt_fpath_inp
+    txt_fpath_out = args.txt_fpath_out
+    num_workers   = args.num_workers
     
     ### load motif
     with open(txt_fpath_inp, "rb") as f:
@@ -160,68 +159,26 @@ def main(args):
     ### get motif log-odds and empirical background
     dct_arr_motif_lod_WxB = obj["lods"]
     arr_bg_B = obj["bg"]
-    arr_bg_B = np.asarray(arr_bg_B, dtype=float).reshape(-1)
-    arr_bg_B = arr_bg_B / arr_bg_B.sum()
 
     print(f"Loaded {len(dct_arr_motif_lod_WxB)} motifs")
     print(f"Loaded background: {arr_bg_B}")
     
     ### Run batch precomputation
-    dct_pmap_core = batch_precompute_pmaps_parallel(
+    dct_results = batch_precompute_pmaps_parallel(
         dct_arr_motif_lod_WxB,
         arr_bg_B,
         num_alpha=1e-3,
-        num_precision=1e-2,
-        lst_score_range=(-60, 60),
+        num_precision=1e-3,
+        lst_score_range=(-40, 40),
         num_verbose_every=100,
         num_workers=num_workers
     )
+    
+    ### Save the dictionary
+    with open(txt_fpath_out, "wb") as f:
+        pickle.dump(dct_results, f, protocol=pickle.HIGHEST_PROTOCOL)
 
-    ### show example
-    first_key = next((k for k,v in dct_pmap_core.items() if v is not None), None)
-    if first_key is not None:
-        first_val = dct_pmap_core[first_key]
-        print("Sanity motif:", first_key, "grid_len=", len(first_val["arr_num_score_grid"]), "Tbind=", first_val["num_Tbind"])
-
-    ### Build PMAP file that includes PWM + ccdf
-    dct_pmap_out = {
-        "meta": {
-            "alphabet": obj.get("alphabet", "ACGT"),
-            "bg": arr_bg_B,
-            "alpha": 1e-3,
-            "precision": 1e-2,
-            "score_range": (-60, 60),
-        },
-        "motifs": {}
-    }
-
-    dct_tbind = {}
-
-    for name, res in dct_pmap_core.items():
-        if res is None:
-            continue
-        dct_pmap_out["motifs"][name] = {
-            "arr_num_score_grid": res["arr_num_score_grid"],
-            "arr_num_score_pmf":  res["arr_num_score_pmf"],
-            "arr_num_score_ccdf": res["arr_num_score_ccdf"],
-            "num_Tbind":          res["num_Tbind"],
-        }
-        dct_tbind[name] = res["num_Tbind"]
-
-    ### save PMAP
-    with open(txt_fpath_out_pmap, "wb") as f:
-        pickle.dump(dct_pmap_out, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-    ### save TBIND
-    dct_tbind_out = {
-        "meta": dct_pmap_out["meta"],
-        "tbind": dct_tbind,
-    }
-    with open(txt_fpath_out_tbind, "wb") as f:
-        pickle.dump(dct_tbind_out, f, protocol=pickle.HIGHEST_PROTOCOL)
-
-    print(f"Saved pmap motifs: {len(dct_pmap_out['motifs'])} -> {txt_fpath_out_pmap}")
-    print(f"Saved tbind motifs: {len(dct_tbind)} -> {txt_fpath_out_tbind}")
+    print(f"Saved DP-maps for {len(dct_results)} motifs -> {txt_fpath_out}")
 
 # ====================================================================
 # CLI
@@ -231,10 +188,9 @@ if __name__ == "__main__":
     ### parse arguments
     parser = argparse.ArgumentParser(description="Precompute DP-based p-value mappings (PMAPs) for motifs")
     
-    parser.add_argument("--txt_fpath_inp",       type=str, required=True, help="Path to input motif pwd/lods file")
-    parser.add_argument("--txt_fpath_out_pmap",  type=str, required=True, help="Path to output motif pmap file")
-    parser.add_argument("--txt_fpath_out_tbind", type=str, required=True, help="Path to output motif Tbind file")
-    parser.add_argument("--num_workers",         type=int, default =10,   help="Number of process for parallelization")
+    parser.add_argument("--txt_fpath_inp",  type=str, required=True, help="Path to input motif pwd/lods file")
+    parser.add_argument("--txt_fpath_out",  type=str, required=True, help="Path to output motif pmap file")
+    parser.add_argument("--num_workers",    type=int, default =10,   help="Number of process for parallelization")
     
     args = parser.parse_args()
 

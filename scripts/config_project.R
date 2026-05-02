@@ -82,3 +82,54 @@ fun_markdown_table = function(dat){
     dat %>% kableExtra::kable("markdown")    
 }
 
+
+
+### helper function for setting plot theme
+theme_pub <- function(base_size = 10) {
+  theme_cowplot() +
+    background_grid(
+      #major = "xy",
+      #minor = "none",
+      #colour.major = "grey85",
+      #size.major = 0.3
+    ) +
+    theme(
+      ## Plot titles
+      plot.title = element_text(
+        size = base_size * 1.4,
+        face = "bold",
+        hjust = 0
+      ),
+      plot.subtitle = element_text(
+        size = base_size * 1.1,
+        #margin = margin(b = 6)
+      ),
+
+      ## Axis titles
+      axis.title.x = element_text(
+        size = base_size * 1.1,
+        #margin = margin(t = 6)
+      ),
+      axis.title.y = element_text(
+        size = base_size * 1.1,
+        #margin = margin(r = 6)
+      ),
+
+      ## Axis text
+      axis.text = element_text(
+        size = base_size
+      ),
+
+      ## Legend
+      legend.title = element_text(size = base_size * 1.05),
+      legend.text  = element_text(size = base_size),
+
+      ## DEFAULT-SAFE margins
+      plot.margin = margin(
+        t = 8,
+        r = 16,
+        b = 12,
+        l = 10
+      )
+    )
+}
