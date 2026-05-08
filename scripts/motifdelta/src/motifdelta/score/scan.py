@@ -241,8 +241,8 @@ def scan_sequence_batch(
 
 def one_hot_batch(lst_seq: List[str], txt_alphabet: str = "ACGT") -> np.ndarray:
     """
-    Convenience: one-hot encode a batch of sequences into (N,L,B).
-    Assumes all sequences same length (common in your variant window FASTAs).
+    One-hot encode a batch of sequences into (N,L,B).
+    Assumes all sequences same length.
     """
     if len(lst_seq) == 0:
         raise ValueError("lst_seq is empty.")

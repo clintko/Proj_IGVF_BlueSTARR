@@ -1,5 +1,6 @@
 """
 Module for DP-based p-value mapping and T_bind calculation
+Note: T_bind is the critical value for given a significance level alpha
 """
 
 import numpy as np
@@ -241,7 +242,7 @@ def map_score_to_pvalue(
     np.ndarray
         Right-tail p-values corresponding to arr_num_score.
     """
-    # Optional clip (helps avoid index warnings and makes behavior explicit)
+    ### Optional clip (avoid index warnings)
     if do_clip:
         smin, smax = arr_num_score_grid[0], arr_num_score_grid[-1]
         arr_score = np.clip(arr_num_score, smin, smax)
@@ -255,7 +256,7 @@ def map_score_to_pvalue(
         arr_num_pval = arr_num_score_ccdf[idx]
         return arr_num_pval
 
-    # Linear interpolation: smooths p-values between neighboring bins
-    # np.interp assumes x is increasing (grid is increasing)
+    ### Linear interpolation: smooths p-values between neighboring bins
+    ### np.interp assumes x is increasing (grid is increasing)
     arr_num_pval = np.interp(arr_score, arr_num_score_grid, arr_num_score_ccdf)
     return arr_num_pval

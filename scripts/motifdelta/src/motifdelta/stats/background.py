@@ -1,5 +1,5 @@
 """
-Module for estimating background nucleotide models (0th- and 1st-order)
+Module for estimating background nucleotide models
 """
 
 import numpy as np

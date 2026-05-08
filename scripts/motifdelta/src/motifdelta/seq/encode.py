@@ -25,7 +25,7 @@ def _make_ascii_map(txt_alphabet: str) -> np.ndarray:
 def one_hot_encode(txt_seq: str, txt_alphabet: str = "ACGT") -> np.ndarray:
     """
     One-hot encode a sequence into shape (L, B), dtype float32.
-    Unknown characters (e.g. N) become all-zero rows (same behavior as before).
+    Unknown characters (e.g. N) become all-zero rows.
     """
     L = len(txt_seq)
     B = len(txt_alphabet)
@@ -36,7 +36,7 @@ def one_hot_encode(txt_seq: str, txt_alphabet: str = "ACGT") -> np.ndarray:
 
     table = _make_ascii_map(txt_alphabet)
 
-    # Convert to uint8 bytes, map to indices
+    ### Convert to uint8 bytes, map to indices
     s = txt_seq.encode("ascii", "replace")
     idx = table[np.frombuffer(s, dtype=np.uint8)]  # (L,)
 
@@ -73,7 +73,7 @@ def one_hot_encode_batch(lst_seq: list[str], txt_alphabet: str = "ACGT") -> np.n
 
     out = np.zeros((N, L0, B), dtype=np.float32)
 
-    # build a (N, L) uint8 array of bases
+    ### build a (N, L) uint8 array of bases
     buf = np.frombuffer(("".join(lst_seq)).encode("ascii", "replace"), dtype=np.uint8).reshape(N, L0)
     idx = table[buf]  # (N, L)
 
